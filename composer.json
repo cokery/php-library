@@ -1,0 +1,21 @@
+{
+    "name": "cokery/php-library",
+    "description": "Class Library For PHP",
+    "type": "library",
+    "require": {
+        "php": ">=7.0.1"
+    },
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "cokery",
+            "email": "hou.msn@hotmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "cokery\\":"src/"
+        }
+    }
+}
