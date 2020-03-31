@@ -3,81 +3,307 @@
 namespace cokery\lib;
 
 use SplFileInfo;
+use cokery\lib\Path;
 
-class File extends SplFileInfo
+class File
 {
-	protected $file;
-	public function __construct(string $path)
+	/**
+	 * Get File Info Based On SplFileInfo
+	 *
+	 * @param String $file
+	 * @return void
+	 */
+	public static function info($file)
 	{
-		parent::__construct($path);
+		if (is_file($file)) {
+			return new SplFileInfo($file);
+		} else {
+			return false;
+		}
 
-		// // $path = 'D:\www\htdoc\php-library\src\lib\File.php';
-		
-		// $file->getBaseName(); // string(8) "File.php"
-		// $file->getFileName(); // string(8) "File.php"
-		// $file->getPathName(); // string(41) "D:\www\htdoc\php-library\src\lib\File.php"
-		// $file->getPath();     // string(32) "D:\www\htdoc\php-library\src\lib"
-		// $file->getRealPath(); // string(41) "D:\www\htdoc\php-library\src\lib\File.php"
-		// $file->getFileInfo(); // object
-		// $file->getPathInfo(); // object
-		// $file->getATime();    // int(1585576426)
-		// $file->getCTime();    // int(1585571786)
-		// $file->getMTime();    // int(1585576422)
-		// $file->getExtension();// string(3) "php"
-		// $file->getType();     // string(4) "file"
-		// $file->getSize();     // int(335)
-		// $file->getPerms();    // int(33206)
-		// $file->getOwner();    // int(0)
-		// $file->getGroup();    // int(0)
-		// $file->getInode();	 // int(0)
-		// $file->getLinkTarget();  // string(41) "D: \www\htdoc\php-library\src\lib\File.php"
-		// $file->isDir();  // bool(false)
-		// $file->isFile(); // bool(true)
-		// $file->isLink(); // bool(false)
-		// $file->isReadable();     // bool(true)
-		// $file->isWritable();     // bool(true)
-		// $file->isExecutable();   // bool(false)
-
-		// Get File FullPathName
-		$this->file = $this->getPathname();
+		// $path = 'D:\www\htdoc\php-library\src\lib\File.php';
+		// $info->getBaseName(); 	// string(8) "File.php"
+		// $info->getFileName(); 	// string(8) "File.php"
+		// $info->getPathName(); 	// string(41) "D:\www\htdoc\php-library\src\lib\File.php"
+		// $info->getPath();     	// string(32) "D:\www\htdoc\php-library\src\lib"
+		// $info->getRealPath(); 	// string(41) "D:\www\htdoc\php-library\src\lib\File.php"
+		// $info->getFileInfo(); 	// object
+		// $info->getPathInfo(); 	// object
+		// $info->getATime();    	// int(1585576426)
+		// $info->getCTime();    	// int(1585571786)
+		// $info->getMTime();    	// int(1585576422)
+		// $info->getExtension();	// string(3) "php"
+		// $info->getType();     	// string(4) "file"
+		// $info->getSize();     	// int(335)
+		// $info->getPerms();    	// int(33206)
+		// $info->getOwner();    	// int(0)
+		// $info->getGroup();    	// int(0)
+		// $info->getInode();	 	// int(0)
+		// $info->getLinkTarget();  // string(41) "D: \www\htdoc\php-library\src\lib\File.php"
+		// $info->isDir();  		// bool(false)
+		// $info->isFile(); 		// bool(true)
+		// $info->isLink(); 		// bool(false)
+		// $info->isReadable();     // bool(true)
+		// $info->isWritable();     // bool(true)
+		// $info->isExecutable();   // bool(false)
 	}
 
-	public function create($overwrite = false)
+	/**
+	 * Create File
+	 *
+	 * @param String $file
+	 * @param boolean $overwrite
+	 * @return Boolean
+	 */
+	public static function create($file, $overwrite = false)
 	{
-		if (is_file($this->file)) {
-			// 解析路径
-			// ****没有的话需要创建文件路径
-
+		if (is_file($file)) {
 			if ($overwrite == true) {
-				// **** 删除原始文件
+				// delete existed file
+				Self::delete($file);
 
-				// 新建文件
+				// create file
 				return touch($file);
 			} else {
 				return false;
 			}
 		} else {
+			// get file path
+			$path = Self::info($file)->getPath();
+
+			// create path
+			if (!is_dir($path)) {
+				Path::create($path);
+			}
+
+			// create file
 			return touch($file);
 		}
 	}
 
-	public function delete()
+	/**
+	 * Delete File
+	 *
+	 * @param String $file
+	 * @return Boolean
+	 */
+	public static function delete($file)
 	{
-		
+		if (is_file($file)) {
+			$res = unlink($file);
+			clearstatcache();
+			return $res;
+		} else {
+			return false;
+		}
 	}
 
-	public function rename()
+	
+
+	/**
+	 * Move File
+	 *
+	 * @param String $file
+	 * @param String $newFile
+	 * @param boolean $overWrite
+	 * @return void
+	 */
+	public static function move($file, $newFile, $overWrite = false)
 	{
-		
+		$file    = Path::transPath($file);
+		$newFile = Path::transPath($newFile);
+
+		// check file
+		if (is_file($file)) {
+			// check newFile
+			if (is_file($newFile)) {
+				// check $overWrite
+				if ($overWrite = false) {
+					return false;
+				} else {
+					// delete existed $newFile
+					self::delete($newFile);
+
+					return rename($file, $newFile);
+				}
+			} else {
+				// get file path
+				$path = Self::info($file)->getPath();
+
+				// check $path
+				if (is_dir($path)) {
+					return rename($file, $newFile);
+				} else {
+					// create file path
+					Path::create($path);
+
+					return rename($file, $newFile);
+				}
+			}
+		} else {
+			return false;
+		}
 	}
 
-	public function move()
+	/**
+	 * Copy File
+	 *
+	 * @param String $file
+	 * @param String $newFile
+	 * @param boolean $overWrite
+	 * @return void
+	 */
+	public static function copy($file, $newFile, $overWrite = false)
 	{
-		
+		$file    = Path::transPath($file);
+		$newFile = Path::transPath($newFile);
+		// check file
+		if (is_file($file)) {
+			// check new file
+			if (is_file($newFile)) {
+				// check $overWrite
+				if ($overWrite = false) {
+					return false;
+				} else {
+					self::delete($newFile);
+					return copy($file, $newFile);
+				}
+			} else {
+				// get file path
+				$path = Self::info($file)->getPath();
+
+				// check path
+				if (is_dir($path)) {
+					return copy($file, $newFile);
+				} else {
+					// create path
+					Path::create($path);
+
+					return copy($file, $newFile);
+				}
+			}
+		} else {
+			return false;
+		}
 	}
 
-	public function copy()
+	/**
+	 * Rename File
+	 *
+	 * @param String $file
+	 * @param String $newFileName
+	 * @param boolean $overWrite
+	 * @return void
+	 */
+	public static function rename($file, $newFileName, $overWrite = false)
 	{
-		
+		$file = Path::transPath($file);
+
+		// check file
+		if (is_file($file)) {
+			// get file path
+			$path = Self::info($file)->getPath();
+			$newFile = $path . "/" . $newFileName;
+			// check newFile
+			if (is_file($newFile)) {
+				if ($overWrite = false) {
+					return false;
+				} else {
+					self::delete($newFile);
+					return rename($file, $newFile);
+				}
+			} else {
+				return rename($file, $newFile);
+			}
+		} else {
+			return false;
+		}
 	}
+
+	/**
+	 * Read File
+	 *
+	 * @param String $file
+	 * @param String $writingMode
+	 * @return void
+	 */
+	public static function read($file, $writingMode = 'string')
+	{
+		// check file
+		if (is_file($file)) {
+			// check writeMode
+			if ($writingMode == 'string') {
+				if (function_exists("file_get_contents")) {
+					return file_get_contents($file);
+				} else {
+					$fp = fopen($file, "rb");
+					$str = fread($fp, filesize($file));
+					fclose($fp);
+					return $str;
+				}
+			} elseif ($writingMode == 'array') {
+				$file = file($file);
+				$arr = array();
+				foreach ($file as $value) {
+					$arr[] = trim($value);
+				}
+				return $arr;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Write File
+	 *
+	 * @param String $file
+	 * @param String $str
+	 * @param boolean $overWrite
+	 * @return void
+	 */
+	public static function write($file, $str, $overWrite = false)
+    {
+        if (is_file($file)) {
+            // 覆盖写入
+            if ($overWrite == true) {
+                if (function_exists("file_put_contents")) {
+                    file_put_contents($file, $str);
+                } else {
+                    $fp = fopen($file, "wb");
+                    fwrite($fp, $str);
+                    fclose($fp);
+                }
+            } else {
+                // 文末追加写入
+                if (function_exists("file_put_contents")) {
+                    file_put_contents($file, $str, FILE_APPEND);
+                } else {
+                    $fp = fopen($file, "a+");
+                    fwrite($fp, $str);
+                    fclose($fp);
+                }
+            }
+        } else {
+            return false;
+        }
+    }
+
+	/**
+     * Trans Byte 
+     *
+     * @param [type] $size
+     * @return void
+     */
+    public static function transByte($size)
+    {
+        $i = 1;
+        $arr = array(" B", " KB", " MB", " GB", " TB", " PB", " EB");
+
+        while ($size > 1024) {
+            $size /= 1024;
+            $i++;
+        }
+        return round($size, 2) . $arr[$i - 1];
+    }
 }
