@@ -5,7 +5,26 @@ namespace cokery\lib;
 use SplFileInfo;
 use cokery\lib\Path;
 
-class File
+/**
+ * FileInterFace
+ */
+interface FileInterface
+{
+	public static function info($file);
+	public static function create($file, $overwrite = false);
+	public static function delete($file);
+	public static function move($file, $newFile, $overWrite = false);
+	public static function copy($file, $newFile, $overWrite = false);
+	public static function rename($file, $newFileName, $overWrite = false);
+	public static function read($file, $writingMode = 'string');
+	public static function write($file, $str, $overWrite = false);
+	public static function transByte($size);
+}
+
+/**
+ * File Class Library
+ */
+class File  implements FileInterface
 {
 	/**
 	 * Get File Info Based On SplFileInfo
@@ -98,7 +117,7 @@ class File
 		}
 	}
 
-	
+
 
 	/**
 	 * Move File
@@ -263,47 +282,47 @@ class File
 	 * @return void
 	 */
 	public static function write($file, $str, $overWrite = false)
-    {
-        if (is_file($file)) {
-            // 覆盖写入
-            if ($overWrite == true) {
-                if (function_exists("file_put_contents")) {
-                    file_put_contents($file, $str);
-                } else {
-                    $fp = fopen($file, "wb");
-                    fwrite($fp, $str);
-                    fclose($fp);
-                }
-            } else {
-                // 文末追加写入
-                if (function_exists("file_put_contents")) {
-                    file_put_contents($file, $str, FILE_APPEND);
-                } else {
-                    $fp = fopen($file, "a+");
-                    fwrite($fp, $str);
-                    fclose($fp);
-                }
-            }
-        } else {
-            return false;
-        }
-    }
+	{
+		if (is_file($file)) {
+			// 覆盖写入
+			if ($overWrite == true) {
+				if (function_exists("file_put_contents")) {
+					file_put_contents($file, $str);
+				} else {
+					$fp = fopen($file, "wb");
+					fwrite($fp, $str);
+					fclose($fp);
+				}
+			} else {
+				// 文末追加写入
+				if (function_exists("file_put_contents")) {
+					file_put_contents($file, $str, FILE_APPEND);
+				} else {
+					$fp = fopen($file, "a+");
+					fwrite($fp, $str);
+					fclose($fp);
+				}
+			}
+		} else {
+			return false;
+		}
+	}
 
 	/**
-     * Trans Byte 
-     *
-     * @param [type] $size
-     * @return void
-     */
-    public static function transByte($size)
-    {
-        $i = 1;
-        $arr = array(" B", " KB", " MB", " GB", " TB", " PB", " EB");
+	 * Trans Byte 
+	 *
+	 * @param [type] $size
+	 * @return void
+	 */
+	public static function transByte($size)
+	{
+		$i = 1;
+		$arr = array(" B", " KB", " MB", " GB", " TB", " PB", " EB");
 
-        while ($size > 1024) {
-            $size /= 1024;
-            $i++;
-        }
-        return round($size, 2) . $arr[$i - 1];
-    }
+		while ($size > 1024) {
+			$size /= 1024;
+			$i++;
+		}
+		return round($size, 2) . $arr[$i - 1];
+	}
 }
