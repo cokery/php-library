@@ -3,7 +3,7 @@
 namespace cokery\lib;
 
 use SplFileInfo;
-use cokery\lib\Path;
+use cokery\lib\Directory;
 
 /**
  * FileInterFace
@@ -92,7 +92,7 @@ class File  implements FileInterface
 
 			// create path
 			if (!is_dir($path)) {
-				Path::create($path);
+				Directory::create($path);
 			}
 
 			// create file
@@ -129,8 +129,8 @@ class File  implements FileInterface
 	 */
 	public static function move($file, $newFile, $overWrite = false)
 	{
-		$file    = Path::transPath($file);
-		$newFile = Path::transPath($newFile);
+		$file    = Directory::transPath($file);
+		$newFile = Directory::transPath($newFile);
 
 		// check file
 		if (is_file($file)) {
@@ -154,7 +154,7 @@ class File  implements FileInterface
 					return rename($file, $newFile);
 				} else {
 					// create file path
-					Path::create($path);
+					Directory::create($path);
 
 					return rename($file, $newFile);
 				}
@@ -174,8 +174,8 @@ class File  implements FileInterface
 	 */
 	public static function copy($file, $newFile, $overWrite = false)
 	{
-		$file    = Path::transPath($file);
-		$newFile = Path::transPath($newFile);
+		$file    = Directory::transPath($file);
+		$newFile = Directory::transPath($newFile);
 		// check file
 		if (is_file($file)) {
 			// check new file
@@ -196,7 +196,7 @@ class File  implements FileInterface
 					return copy($file, $newFile);
 				} else {
 					// create path
-					Path::create($path);
+					Directory::create($path);
 
 					return copy($file, $newFile);
 				}
@@ -216,7 +216,7 @@ class File  implements FileInterface
 	 */
 	public static function rename($file, $newFileName, $overWrite = false)
 	{
-		$file = Path::transPath($file);
+		$file = Directory::transPath($file);
 
 		// check file
 		if (is_file($file)) {

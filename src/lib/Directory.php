@@ -3,7 +3,7 @@ namespace cokery\lib;
 
 use cokery\lib\File;
 
-class Path
+class Directory
 {
     public static function info($path)
     {
@@ -31,7 +31,7 @@ class Path
 
     public static function delete($folder)
     {
-        // 检测文件夹是否存在
+        // check $path
         if (is_dir($folder)) {
             // StandardizePath
             $folder = self::standardizePath($folder);
@@ -253,30 +253,6 @@ class Path
                 return $size;
             }
         }
-    }
-
-    /**
-     * 路径转义
-     *
-     * @param String $dir
-     * @return String
-     */
-    public static function transPath($dir)
-    {
-        return str_replace('\\', DIRECTORY_SEPARATOR,  $dir);
-    }
-
-    /**
-     * 转义并规范路径 最后一位如果不是 '/'，需补全
-     * 
-     * @param String $folder
-     * @return String
-     */
-    public static function standardizePath($dir)
-    {
-        // widnows路径转义
-        $dir = self::transPath($dir);
-        return substr($dir, -1) == '/' ? $dir : $dir . '/';
     }
 
     public static function transPath($path)
