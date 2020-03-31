@@ -12,10 +12,9 @@ interface FileInterface
 {
 	public static function info($file);
 	public static function create($file, $overwrite = false);
-	public static function delete($file);
-	public static function move($file, $newFile, $overWrite = false);
-	public static function copy($file, $newFile, $overWrite = false);
-	public static function rename($file, $newFileName, $overWrite = false);
+	public static function del($file);
+	public static function move($file, $newFile, $overWrite = false, $bothSave = false);
+	public static function duplicate($file, $newFile, $overWrite = false, $bothSave = false);
 	public static function read($file, $writingMode = 'string');
 	public static function write($file, $str, $overWrite = false);
 	public static function transByte($size);
@@ -29,7 +28,7 @@ class File  implements FileInterface
 	/**
 	 * Get File Info Based On SplFileInfo
 	 *
-	 * @param String $file
+	 * @param String $file pathName
 	 * @return void
 	 */
 	public static function info($file)
@@ -70,8 +69,8 @@ class File  implements FileInterface
 	/**
 	 * Create File
 	 *
-	 * @param String $file
-	 * @param boolean $overwrite
+	 * @param String $file pathName
+	 * @param boolean $overwrite false
 	 * @return Boolean
 	 */
 	public static function create($file, $overwrite = false)
@@ -79,7 +78,7 @@ class File  implements FileInterface
 		if (is_file($file)) {
 			if ($overwrite == true) {
 				// delete existed file
-				Self::delete($file);
+				Self::del($file);
 
 				// create file
 				return touch($file);
@@ -88,9 +87,8 @@ class File  implements FileInterface
 			}
 		} else {
 			// get file path
-			$path = Self::info($file)->getPath();
+			$path = pathinfo($file)['dirname'];
 
-			// create path
 			if (!is_dir($path)) {
 				Directory::create($path);
 			}
@@ -103,10 +101,10 @@ class File  implements FileInterface
 	/**
 	 * Delete File
 	 *
-	 * @param String $file
+	 * @param String $file pathName
 	 * @return Boolean
 	 */
-	public static function delete($file)
+	public static function del($file)
 	{
 		if (is_file($file)) {
 			$res = unlink($file);
@@ -118,41 +116,50 @@ class File  implements FileInterface
 	}
 
 	/**
-	 * Move File
+	 * Move FIle
 	 *
-	 * @param String $file
-	 * @param String $newFile
-	 * @param boolean $overWrite
+	 * @param String $file pathName
+	 * @param String $newFile pathName
+	 * @param boolean $overWrite false
+	 * @param boolean $bothSave false
 	 * @return void
 	 */
-	public static function move($file, $newFile, $overWrite = false)
+	public static function move($file, $newFile, $overWrite = false, $bothSave = false)
 	{
 		$file    = Directory::transPath($file);
 		$newFile = Directory::transPath($newFile);
 
-		// check file
 		if (is_file($file)) {
-			// check newFile
 			if (is_file($newFile)) {
-				// check $overWrite
 				if ($overWrite = false) {
-					return false;
+					// if you want to save the same file ,you should rename it
+					if ($bothSave = true) {
+						// get new BaseName = old filename_time.extension
+						$newBaseName = pathinfo($file)['filename'] . '_' . time() . pathinfo($file)['extension'];
+						// get new PathName
+						$newPahName = pathinfo($newFile) . '/' . $newBaseName;
+						// Rename File
+						return rename($file, $newPahName);
+					} else {
+						return false;
+					}
 				} else {
 					// delete existed $newFile
-					self::delete($newFile);
+					self::del($newFile);
 
 					return rename($file, $newFile);
 				}
 			} else {
-				// get file path
-				$path = Self::info($file)->getPath();
+				// get newFile path
+				$newFilePath = pathinfo($newFile)['dirname'];
 
-				// check $path
-				if (is_dir($path)) {
+				if (is_dir($newFilePath)) {
 					return rename($file, $newFile);
 				} else {
+					echo $newFilePath . PHP_EOL;
 					// create file path
-					Directory::create($path);
+					Directory::create($newFilePath);
+					die;
 
 					return rename($file, $newFile);
 				}
@@ -163,33 +170,41 @@ class File  implements FileInterface
 	}
 
 	/**
-	 * Copy File
+	 * duplicate File
 	 *
-	 * @param String $file
-	 * @param String $newFile
-	 * @param boolean $overWrite
+	 * @param String $file pathName
+	 * @param String $newFile pathName
+	 * @param boolean $overWrite false
+	 * @param boolean $bothSave false
 	 * @return void
 	 */
-	public static function copy($file, $newFile, $overWrite = false)
+	public static function duplicate($file, $newFile, $overWrite = false, $bothSave = false)
 	{
 		$file    = Directory::transPath($file);
 		$newFile = Directory::transPath($newFile);
-		// check file
+
 		if (is_file($file)) {
-			// check new file
 			if (is_file($newFile)) {
-				// check $overWrite
-				if ($overWrite = false) {
-					return false;
+				if ($overWrite == false) {
+					// if you want to save the same file ,you should rename it
+					if ($bothSave == true) {
+						// get new BaseName = old filename_time.extension
+						$newBaseName = pathinfo($file)['filename'] . '_' . time() .'.'. pathinfo($file)['extension'];
+						// get new PathName
+						$newPahName = pathinfo($newFile)['dirname'] . '/' . $newBaseName;
+						// Rename File
+						Self::duplicate($file, $newPahName);
+					} else {
+						return false;
+					}
 				} else {
-					self::delete($newFile);
+					self::del($newFile);
 					return copy($file, $newFile);
 				}
 			} else {
 				// get file path
 				$path = Self::info($file)->getPath();
 
-				// check path
 				if (is_dir($path)) {
 					return copy($file, $newFile);
 				} else {
@@ -205,43 +220,10 @@ class File  implements FileInterface
 	}
 
 	/**
-	 * Rename File
-	 *
-	 * @param String $file
-	 * @param String $newFileName
-	 * @param boolean $overWrite
-	 * @return void
-	 */
-	public static function rename($file, $newFileName, $overWrite = false)
-	{
-		$file = Directory::transPath($file);
-
-		// check file
-		if (is_file($file)) {
-			// get file path
-			$path = Self::info($file)->getPath();
-			$newFile = $path . "/" . $newFileName;
-			// check newFile
-			if (is_file($newFile)) {
-				if ($overWrite = false) {
-					return false;
-				} else {
-					self::delete($newFile);
-					return rename($file, $newFile);
-				}
-			} else {
-				return rename($file, $newFile);
-			}
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	 * Read File
 	 *
-	 * @param String $file
-	 * @param String $writingMode
+	 * @param String $file pathName
+	 * @param String $writingMode string
 	 * @return void
 	 */
 	public static function read($file, $writingMode = 'string')
@@ -274,9 +256,9 @@ class File  implements FileInterface
 	/**
 	 * Write File
 	 *
-	 * @param String $file
-	 * @param String $str
-	 * @param boolean $overWrite
+	 * @param String $file pathName
+	 * @param String $str string
+	 * @param boolean $overWrite false
 	 * @return void
 	 */
 	public static function write($file, $str, $overWrite = false)
@@ -309,7 +291,7 @@ class File  implements FileInterface
 	/**
 	 * Trans Byte 
 	 *
-	 * @param [type] $size
+	 * @param Int $size
 	 * @return void
 	 */
 	public static function transByte($size)
@@ -322,5 +304,15 @@ class File  implements FileInterface
 			$i++;
 		}
 		return round($size, 2) . $arr[$i - 1];
+	}
+
+	/**
+	 * Search File
+	 *
+	 * @param String $file baseName (fileName)
+	 * @return void
+	 */
+	public static function search($file)
+	{
 	}
 }

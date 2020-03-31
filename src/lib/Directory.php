@@ -1,4 +1,5 @@
 <?php
+
 namespace cokery\lib;
 
 use cokery\lib\File;
@@ -10,20 +11,20 @@ class Directory
         return File::info($path);
     }
 
-    public static function create($path,$mode = 0777)
+    public static function create($path, $mode = 0777)
     {
         if (is_null($path) || $path == "" || is_dir($path)) {
             return false;
         } else {
             // StandardizePath
-            $path = self::standardizePath($path);
+            echo $path = self::standardizePath($path);
 
-            $path = '';
+            $tmp = '';
             $arr = explode('/', $path);
             foreach ($arr as $str) {
-                $path .= $str . '/';
-                if (!file_exists($path)) {
-                    return mkdir($path, $mode);
+                $tmp .= $str . '/';
+                if (!file_exists($tmp)) {
+                    return mkdir($tmp, $mode);
                 }
             }
         }
@@ -126,7 +127,7 @@ class Directory
                 continue;
             }
             if (!is_dir($folder . $file)) {
-                File::copy($folder . $file, $newFolder . $file, $overWrite);
+                File::duplicate($folder . $file, $newFolder . $file, $overWrite);
             } else {
                 self::copy($folder . $file, $newFolder . $file, $overWrite);
             }
@@ -137,7 +138,7 @@ class Directory
     /**
      * 重命名文件夹
      *
-     * @param String $folder fullpath
+     * @param String $folder PathName
      * @param String $newName
      * @param boolean $overWrite
      * @return boolean
@@ -166,7 +167,7 @@ class Directory
         }
     }
 
-    
+
     /**
      * 返回目录字节大小
      *
