@@ -131,9 +131,9 @@ class File  implements FileInterface
 
 		if (is_file($file)) {
 			if (is_file($newFile)) {
-				if ($overWrite = false) {
+				if ($overWrite == false) {
 					// if you want to save the same file ,you should rename it
-					if ($bothSave = true) {
+					if ($bothSave == true) {
 						// get new BaseName = old filename_time.extension
 						$newBaseName = pathinfo($file)['filename'] . '_' . time() . pathinfo($file)['extension'];
 						// get new PathName
