@@ -34,7 +34,7 @@ class File  implements FileInterface
 	 */
 	public static function info($file)
 	{
-		if (is_file($file)) {
+		if (is_file($file) || is_dir($file)) {
 			return new SplFileInfo($file);
 		} else {
 			return false;
@@ -116,8 +116,6 @@ class File  implements FileInterface
 			return false;
 		}
 	}
-
-
 
 	/**
 	 * Move File
@@ -261,8 +259,8 @@ class File  implements FileInterface
 					return $str;
 				}
 			} elseif ($writingMode == 'array') {
-				$file = file($file);
 				$arr = array();
+				$file = file($file);
 				foreach ($file as $value) {
 					$arr[] = trim($value);
 				}
