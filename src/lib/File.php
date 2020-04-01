@@ -189,11 +189,11 @@ class File  implements FileInterface
 					// if you want to save the same file ,you should rename it
 					if ($bothSave == true) {
 						// get new BaseName = old filename_time.extension
-						$newBaseName = pathinfo($file)['filename'] . '_' . time() .'.'. pathinfo($file)['extension'];
+						$newBaseName = pathinfo($file)['filename'] . '_' . time() . '.' . pathinfo($file)['extension'];
 						// get new PathName
 						$newPahName = pathinfo($newFile)['dirname'] . '/' . $newBaseName;
 						// Rename File
-						Self::duplicate($file, $newPahName);
+						return copy($file, $newPahName);
 					} else {
 						return false;
 					}
