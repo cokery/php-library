@@ -22,6 +22,22 @@ interface FileInterface
 
 /**
  * File Class Library
+ * 
+ * File::info($file);
+ * 
+ * File::create($file, $overwrite = false);
+ * 
+ * File::del($file);
+ * 
+ * File::move($file, $newFile, $overWrite = false, $bothSave = false);
+ * 
+ * File::duplicate($file, $newFile, $overWrite = false, $bothSave = false);
+ * 
+ * File::read($file, $writingMode = 'string');
+ * 
+ * File::write($file, $str, $overWrite = false);
+ * 
+ * File::transByte($size);
  */
 class File  implements FileInterface
 {
@@ -315,4 +331,6 @@ class File  implements FileInterface
 	public static function search($file)
 	{
 	}
+
+
 }

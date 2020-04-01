@@ -3,6 +3,7 @@
 namespace cokery\lib;
 
 use cokery\lib\File;
+use cokery\lib\Option;
 
 class Directory
 {
@@ -11,46 +12,66 @@ class Directory
         return File::info($path);
     }
 
+    /**
+     * Create Directory
+     *
+     * @param String $path path
+     * @param Int $mode 0777
+     * @return void
+     */
     public static function create($path, $mode = 0777)
     {
         if (is_null($path) || $path == "" || is_dir($path)) {
             return false;
         } else {
             // StandardizePath
-            echo $path = self::standardizePath($path);
+            $path = self::standardizePath($path);
 
             $tmp = '';
-            $arr = explode('/', $path);
+            // check OS
+            if (Option::os() == 'windows') {
+                $arr = explode('\\', $path);
+            } else {
+                $arr = explode('/', $path);
+            }
+
             foreach ($arr as $str) {
                 $tmp .= $str . '/';
-                if (!file_exists($tmp)) {
+                $tmp . PHP_EOL;
+                if (!is_dir($tmp)) {
                     return mkdir($tmp, $mode);
                 }
             }
         }
     }
 
-    public static function delete($folder)
+    /**
+     * Delete Directory
+     *
+     * @param String $path path
+     * @return void
+     */
+    public static function del($path)
     {
         // check $path
-        if (is_dir($folder)) {
+        if (is_dir($path)) {
             // StandardizePath
-            $folder = self::standardizePath($folder);
+            $path = self::standardizePath($path);
 
-            if ($handle = opendir($folder)) {
+            if ($handle = opendir($path)) {
                 while (($file = readdir($handle)) !== false) {
                     if ($file == "." or $file == "..") continue;
-                    $file = $folder . DIRECTORY_SEPARATOR . $file;
-                    //  表示$file是$folder的子目录
+                    $file = $path . DIRECTORY_SEPARATOR . $file;
+                    //  表示$file是$path
                     if (is_dir($file)) {
-                        self::delete($file);
+                        self::del($file);
                     } else {
                         unlink($file);
                     }
                 }
                 closedir($handle);
                 // 删除空文件夹
-                return rmdir($folder);
+                return rmdir($path);
             } else {
                 return false;
             }
@@ -58,9 +79,9 @@ class Directory
             return false;
         }
     }
+
     /**
-     * 移动文件夹
-     * 检查新路径是否存在文件，是否覆盖
+     * Move Directory
      * 
      * @param String $folder with path
      * @param String $newFolder  with path
@@ -69,22 +90,21 @@ class Directory
      */
     public static function move($folder, $newFolder, $overWrite = false)
     {
-        // 路径末尾 为 /
         $folder    = self::standardizePath($folder);
         $newFolder = self::standardizePath($newFolder);
 
-        // 判断是否为目录
         if (is_dir($folder)) {
-            // 判断新路径是否存在
             if (!is_dir($newFolder)) {
                 self::create($newFolder);
             }
+    
             // 文件操作
             if ($dirHandle = opendir($folder)) {
                 while (false !== ($file = readdir($dirHandle))) {
                     if ($file == '.' || $file == '..') {
                         continue;
                     }
+
                     if (!is_dir($folder . $file)) {
                         File::move($folder . $file, $newFolder . $file, $overWrite);
                     } else {
@@ -156,7 +176,7 @@ class Directory
                 if ($overWrite = false) {
                     return false;
                 } else {
-                    self::delete($newFolder);        // 删除已存在的新文件
+                    self::del($newFolder);        // 删除已存在的新文件
                     return rename($folder, $newFolder);     // 重命名文件
                 }
             } else {
@@ -258,12 +278,19 @@ class Directory
 
     public static function transPath($path)
     {
-        return str_replace('\\', DIRECTORY_SEPARATOR,  $path);
+        if (Option::os() == 'windows') {
+            return str_replace('\\', DIRECTORY_SEPARATOR,  $path);
+        }
     }
 
     public static function standardizePath($path)
     {
         $path = self::transPath($path);
-        return substr($path, -1) == '/' ? $path : $path . '/';
+        if (Option::os() == 'windows') {
+            return substr($path, -1) == '/' ? $path : $path . '\\';
+        }else{
+            return substr($path, -1) == '/' ? $path : $path . '/';
+        }
+
     }
 }
