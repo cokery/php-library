@@ -1,5 +1,4 @@
 <?php
-
 namespace cokery\lib;
 
 // Import PHPMailer classes into the global namespace
@@ -10,45 +9,68 @@ use PHPMailer\PHPMailer\Exception;
 
 class Mail
 {
-    public function test()
+    public $mail;
+    public function __construct($mail)
     {
-
-        // Instantiation and passing `true` enables exceptions
-        $mail = new PHPMailer(true);
-
         try {
-            //Server settings
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
-            $mail->isSMTP();                                            // Send using SMTP
-            $mail->Host       = 'smtp1.example.com';                    // Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = 'user@example.com';                     // SMTP username
-            $mail->Password   = 'secret';                               // SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-            $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
-
-            //Recipients
-            $mail->setFrom('from@example.com', 'Mailer');
-            $mail->addAddress('joe@example.net', 'Joe User');     // Add a recipient
-            $mail->addAddress('ellen@example.com');               // Name is optional
-            $mail->addReplyTo('info@example.com', 'Information');
-            $mail->addCC('cc@example.com');
-            $mail->addBCC('bcc@example.com');
-
-            // Attachments
-            $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
-            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
-
-            // Content
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-            $mail->send();
+            $this->$mail = $mail;
+            // 配置服务器
+            $this->serverConf($this->$mail);
+            // 收件人
+            $this->sendTo($this->$mail);
+            // 附件
+            $this->attach($this->$mail);
+            // 内容
+            $this->content($this->mail);
+            $this->mail->send();
             echo 'Message has been sent';
         } catch (Exception $e) {
             echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
     }
+
+    public function serverConf($mail)
+    {
+        // 服务器设定
+        $mail->isSMTP(); // 使用 SMTP 发送
+        $mail->Host       = 'smtp.sina.com'; // 将 SMTP 服务器设置为发送通过
+        $mail->Port       = 465;  // 要连接的TCP端口，对上面的`PHPMailer::ENCRYPTION_SMTPS`使用465
+        $mail->SMTPAuth   = true; // 启用 SMTP 身份验证
+
+        $mail->Username   = 'cokery@sina.com'; // SMTP 用户名
+        $mail->Password   = '3b0ca664489be30d';  // SMTP 密码
+
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // 启用TLS加密； 鼓励使用PHPMailer::ENCRYPTION_SMTPS
+        $mail->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
+    }
+
+    public function sendTo($mail)
+    {
+        //收件者
+        $mail->setFrom('cokery@sina.com', 'Mailer');
+        $mail->addAddress('77171354@qq.com', 'addAddress');     // 添加收件人 // 名称是可选的
+        $mail->addReplyTo('hou.msn@hotmail.com', 'addReplyTo'); // 添加一个“答复”地址。
+        $mail->addCC('hou.msn@hotmail.com');
+        $mail->addBCC('hou.msn@hotmail.com');
+    }
+
+    public function attach($mail)
+    {
+        // 附件
+        $mail->addAttachment('/var/tmp/file.tar.gz');         // 添加附件
+        $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // 名称可选
+    }
+
+    public function content($mail)
+    {
+        // 内容
+        $mail->isHTML(true);                                  // 将电子邮件格式设置为HTML
+        $mail->Subject = 'Here is the subject';
+        $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+        $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+    }
 }
+// Instantiation and passing `true` enables exceptions
+$mail = new \PHPMailer\PHPMailer\PHPMailer();
+$mail = new Mail($mail);
+print_r($mail);
