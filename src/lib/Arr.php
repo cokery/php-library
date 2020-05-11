@@ -15,7 +15,7 @@ class Arr
         $tree = array();
         foreach ($data as $k => $v) {
             if ($v['pid'] == $pid) {
-                $v['child'] = tree($data, $v['id']);
+                $v['child'] = $this->tree($data, $v['id']);
                 $tree[] = $v;
                 unset($data[$k]);
             }
@@ -36,7 +36,7 @@ class Arr
         foreach ($data as $key => $d) {
             if ($d['pid'] == $pid) {
                 $arr[] = $d;
-                $arr = array_merge($arr, digui($data, $d['id']));
+                $arr = array_merge($arr, $this->digui($data, $d['id']));
             }
         }
 
