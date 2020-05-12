@@ -8,7 +8,7 @@ use PHPMailer\PHPMailer\Exception;
 // Load Composer's autoloader
 require 'vendor/autoload.php';
 
-class mail extends PHPMailer
+class Mail extends PHPMailer
 {
     public function __construct()
     {
@@ -29,6 +29,13 @@ class mail extends PHPMailer
         $this->Password   = '3b0ca664489be30d';  // SMTP 密码
     }
 
+    /**
+     * 添加发件人
+     *
+     * @param string $from
+     * @param string $name
+     * @return void
+     */
     public function sendFrom($from, $name = null)
     {
         if ($name == null) {
@@ -39,6 +46,13 @@ class mail extends PHPMailer
         return $this;
     }
 
+    /**
+     * 添加收件人
+     *
+     * @param string $to
+     * @param string $name
+     * @return void
+     */
     public function sendTo($to, $name = null)
     {
         if ($name == null) {
@@ -50,21 +64,122 @@ class mail extends PHPMailer
         return $this;
     }
 
+    /**
+     * 邮件回函地址
+     *
+     * @param [type] $reply
+     * @param [type] $name
+     * @return void
+     */
+    public function replyTo($reply, $name = null)
+    {
+        if ($name == null) {
+            $this->addReplyTo($reply);
+        } else {
+            $this->addReplyTo($reply, $name);
+        }
+
+        return $this;
+    }
+
+    /**
+     * 邮件抄送地址
+     *
+     * @param [type] $cc
+     * @param [type] $name
+     * @return void
+     */
+    public function cc($cc, $name = null)
+    {
+        if ($name == null) {
+            $this->addCC($cc);
+        } else {
+            $this->addCC($cc, $name);
+        }
+
+        return $this;
+    }
+
+    /**
+     * 邮件密送地址
+     *
+     * @param [type] $bcc
+     * @param [type] $name
+     * @return void
+     */
+    public function bcc($bcc, $name = null)
+    {
+        if ($name == null) {
+            $this->addBCC($bcc);
+        } else {
+            $this->addBCC($bcc, $name);
+        }
+        return $this;
+    }
+
+    /**
+     * 邮件主题
+     *
+     * @param string $subject
+     * @return void
+     */
     public function setSubject($subject)
     {
         $this->Subject = $subject;
         return $this;
     }
 
+    /**
+     * 邮件正文
+     *
+     * @param string $body
+     * @return void
+     */
     public function setBody($body)
     {
         $this->Body = $body;
         return $this;
     }
 
+    /**
+     * 邮件纯文本
+     *
+     * @param string $altBody
+     * @return void
+     */
     public function setAltBody($altBody)
     {
         $this->AltBody = $altBody;
+        return $this;
+    }
+
+    /**
+     * 邮件附件
+     *
+     * @param string $file
+     * @param string $newName
+     * @return void
+     */
+    public function attachment($file, $newName = null)
+    {
+
+        if ($newName == null) {
+            $this->addAttachment($file);
+        } else {
+            $this->addAttachment($file, $newName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * 发送邮件
+     *
+     * @return void
+     */
+    public function send()
+    {
+        parent::send();
         return $this;
     }
 }
@@ -76,33 +191,5 @@ $mail->sendFrom('cokery@sina.com', 'Mailer Servie')
     ->sendTo('hou.msn@hotmail.com', 'Customer Client')
     ->setSubject('邮件标题')
     ->setBody('邮件正文')
-    ->setAltBody('邮件纯文本');
-print_r($mail);
-
-die;
-// Instantiation and passing `true` enables exceptions
-$mail = new PHPMailer(true);
-
-try {
-    // 服务器设定
-
-    $mail->isHTML(true);                                  // 将电子邮件格式设置为HTML
-
-    //收件者
-    $mail->setFrom('cokery@sina.com', 'Mailer');
-    $mail->addAddress('775151354@qq.com', 'addAddress');     // 添加收件人 // 名称是可选的
-    $mail->addAddress('775151354@qq.com');     // 添加收件人 // 名称是可选的
-    $mail->addReplyTo('hou.msn@hotmail.com', 'addReplyTo'); // 添加一个“答复”地址。
-    $mail->addCC('hou.msn@hotmail.com');
-    $mail->addBCC('hou.msn@hotmail.com');
-
-    // 内容
-    $mail->Subject = 'Here is the subject';
-    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-    $mail->send();
-    echo 'Message has been sent';
-} catch (Exception $e) {
-    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-}
+    ->setAltBody('邮件纯文本')
+    ->send();
