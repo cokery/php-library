@@ -4,8 +4,7 @@
     "type": "library",
     "require": {
         "php": ">=7.0.1",
-        "phpmailer/phpmailer": "~6.1",
-        "phpoffice/phpspreadsheet": ">=1.12"
+        "phpmailer/phpmailer": "~6.1"
     },
     "license": "BSD-3-Clause",
     "authors": [
