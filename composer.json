@@ -5,7 +5,8 @@
     "require": {
         "php": ">=7.0.1",
         "phpmailer/phpmailer": "~6.1",
-        "codeitnowin/barcode":"*"
+        "codeitnowin/barcode":"*",
+        "league/csv":"*"
     },
     "license": "BSD-3-Clause",
     "authors": [
