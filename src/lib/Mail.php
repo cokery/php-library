@@ -16,11 +16,16 @@ class Mail extends PHPMailer
         $this->smtp();
     }
 
+    public function config(array $options = [])
+    {
+        
+    }
+
     public function smtp()
     {
-        $this->CharSet = 'utf8'; // 编码
-        $this->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
         $this->isSMTP(); // 使用 SMTP 发送
+        $this->CharSet    = 'utf8'; // 编码
+        $this->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
         $this->Host       = 'smtp.sina.com'; // 将 SMTP 服务器设置为发送通过
         $this->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // 启用TLS加密； 鼓励使用PHPMailer::ENCRYPTION_SMTPS
         $this->Port       = 465;  // 要连接的TCP端口，对上面的`PHPMailer::ENCRYPTION_SMTPS`使用465
@@ -31,12 +36,9 @@ class Mail extends PHPMailer
 
     /**
      * 添加发件人
-     *
-     * @param string $from
-     * @param string $name
      * @return void
      */
-    public function sendFrom($from, $name = null)
+    public function sendFrom(string $from, string $name = null)
     {
         if ($name == null) {
             $this->setFrom($from);
@@ -185,7 +187,9 @@ class Mail extends PHPMailer
 }
 
 $mail = new mail();
+$mail->config([
 
+]);
 $mail->sendFrom('cokery@sina.com', 'Mailer Servie')
     ->sendTo('775151354@qq.com', 'Customer Client')
     ->sendTo('hou.msn@hotmail.com', 'Customer Client')
