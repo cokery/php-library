@@ -20,13 +20,19 @@ class Mail extends PHPMailer
      *
      * @param array $options
      * @param string $secure
+     * @param bool $debug
      * @return void
      */
-    public function smtp(array $options = [], string $secure = 'ssl')
+    public function smtp(array $options = [], string $secure = 'ssl', bool $debug = false)
     {
         $this->isSMTP(); // 使用 SMTP 发送
         $this->CharSet    = 'utf8'; // 编码
-        // $this->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
+
+        // 启用详细调试输出
+        if ($debug) {
+            $this->SMTPDebug  = SMTP::DEBUG_SERVER;
+        }
+
         $this->SMTPAuth   = true; // 启用 SMTP 身份验证
 
         // TLS加密
