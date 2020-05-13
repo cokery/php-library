@@ -3,7 +3,6 @@
 // These must be at the top of your script, not inside a function
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 // Load Composer's autoloader
 require 'vendor/autoload.php';
@@ -16,29 +15,47 @@ class Mail extends PHPMailer
         $this->smtp();
     }
 
-    public function config(array $options = [])
-    {
-        
-    }
-
-    public function smtp()
+    /**
+     * 配置SMTP服务器
+     *
+     * @param array $options
+     * @param string $secure
+     * @return void
+     */
+    public function smtp(array $options = [], string $secure = 'ssl')
     {
         $this->isSMTP(); // 使用 SMTP 发送
         $this->CharSet    = 'utf8'; // 编码
         $this->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
-        $this->Host       = 'smtp.sina.com'; // 将 SMTP 服务器设置为发送通过
-        $this->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // 启用TLS加密； 鼓励使用PHPMailer::ENCRYPTION_SMTPS
-        $this->Port       = 465;  // 要连接的TCP端口，对上面的`PHPMailer::ENCRYPTION_SMTPS`使用465
         $this->SMTPAuth   = true; // 启用 SMTP 身份验证
-        $this->Username   = 'cokery@sina.com'; // SMTP 用户名
-        $this->Password   = '3b0ca664489be30d';  // SMTP 密码
+
+        // TLS加密
+        if ($secure == 'tls') {
+            $this->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+            if ($options['port'] == null) {
+                $options['port'] = 587;
+            }
+        }
+
+        // SSL加密
+        if ($secure == 'ssl' or $secure == null) {
+            $this->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $options['port'] = 465;
+        }
+
+        $this->Host     = $options['host'];      // 将    SMTP 服务器设置为发送通过
+        $this->Port     = $options['port'];      // 要连接的TCP端口，对上面的`PHPMailer::ENCRYPTION_SMTPS`使用465
+        $this->Username = $options['username'];  // SMTP 用户名
+        $this->Password = $options['password'];  // SMTP 密码
     }
 
     /**
      * 添加发件人
+     * 
      * @return void
      */
-    public function sendFrom(string $from, string $name = null)
+    public function sendFrom($from,  $name = null)
     {
         if ($name == null) {
             $this->setFrom($from);
@@ -55,7 +72,7 @@ class Mail extends PHPMailer
      * @param string $name
      * @return void
      */
-    public function sendTo($to, $name = null)
+    public function sendTo(string $to, string $name = null)
     {
         if ($name == null) {
             $this->addAddress($to);
@@ -69,11 +86,11 @@ class Mail extends PHPMailer
     /**
      * 邮件回函地址
      *
-     * @param [type] $reply
-     * @param [type] $name
+     * @param string $reply
+     * @param string $name
      * @return void
      */
-    public function replyTo($reply, $name = null)
+    public function replyTo(string $reply, string $name = null)
     {
         if ($name == null) {
             $this->addReplyTo($reply);
@@ -87,11 +104,11 @@ class Mail extends PHPMailer
     /**
      * 邮件抄送地址
      *
-     * @param [type] $cc
-     * @param [type] $name
+     * @param string $cc
+     * @param string $name
      * @return void
      */
-    public function cc($cc, $name = null)
+    public function cc(string $cc, string $name = null)
     {
         if ($name == null) {
             $this->addCC($cc);
@@ -105,11 +122,11 @@ class Mail extends PHPMailer
     /**
      * 邮件密送地址
      *
-     * @param [type] $bcc
-     * @param [type] $name
+     * @param string $bcc
+     * @param string $name
      * @return void
      */
-    public function bcc($bcc, $name = null)
+    public function bcc(string $bcc, string $name = null)
     {
         if ($name == null) {
             $this->addBCC($bcc);
@@ -125,7 +142,7 @@ class Mail extends PHPMailer
      * @param string $subject
      * @return void
      */
-    public function setSubject($subject)
+    public function setSubject(string $subject)
     {
         $this->Subject = $subject;
         return $this;
@@ -137,7 +154,7 @@ class Mail extends PHPMailer
      * @param string $body
      * @return void
      */
-    public function setBody($body)
+    public function setBody(string $body)
     {
         $this->Body = $body;
         return $this;
@@ -149,7 +166,7 @@ class Mail extends PHPMailer
      * @param string $altBody
      * @return void
      */
-    public function setAltBody($altBody)
+    public function setAltBody(string $altBody)
     {
         $this->AltBody = $altBody;
         return $this;
@@ -162,7 +179,7 @@ class Mail extends PHPMailer
      * @param string $newName
      * @return void
      */
-    public function attachment($file, $newName = null)
+    public function attachment(string $file, string $newName = null)
     {
 
         if ($newName == null) {
@@ -187,9 +204,14 @@ class Mail extends PHPMailer
 }
 
 $mail = new mail();
-$mail->config([
 
+$mail->smtp([
+    'host'     => "smtp.sina.com",
+    'port'     => 465,
+    'username' => 'cokery@sina.com',
+    'password' => '3b0ca664489be30d',
 ]);
+
 $mail->sendFrom('cokery@sina.com', 'Mailer Servie')
     ->sendTo('775151354@qq.com', 'Customer Client')
     ->sendTo('hou.msn@hotmail.com', 'Customer Client')
