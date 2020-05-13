@@ -26,7 +26,7 @@ class Mail extends PHPMailer
     {
         $this->isSMTP(); // 使用 SMTP 发送
         $this->CharSet    = 'utf8'; // 编码
-        $this->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
+        // $this->SMTPDebug  = SMTP::DEBUG_SERVER; // 启用详细调试输出
         $this->SMTPAuth   = true; // 启用 SMTP 身份验证
 
         // TLS加密
