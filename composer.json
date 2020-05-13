@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "php": ">=7.0.1",
-        "phpmailer/phpmailer": "~6.1"
+        "phpmailer/phpmailer": "~6.1",
+        "codeitnowin/barcode":"*"
     },
     "license": "BSD-3-Clause",
     "authors": [
