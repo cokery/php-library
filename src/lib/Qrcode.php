@@ -7,7 +7,7 @@ use CodeItNow\BarcodeBundle\Utils\QrCode;
 $qrCode = new QrCode();
 
 $qrCode
-    ->setText('QR code by codeitnow.in')
+    ->setText('QR code by codeitnow.in aaa ')
     ->setSize(300)
     ->setPadding(10)
     ->setErrorCorrection('high')
@@ -17,5 +17,4 @@ $qrCode
     ->setLabelFontSize(16)
     ->setImageType(QrCode::IMAGE_TYPE_PNG)
 ;
-
-echo '<img src="data:'.$qrCode->getContentType().';base64,'.$qrCode->generate().'" />';
+$qrCode->save('a.png');
